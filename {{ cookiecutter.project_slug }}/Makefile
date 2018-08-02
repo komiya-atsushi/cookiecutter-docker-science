@@ -63,6 +63,9 @@ sync-from-source: ## download data data source to local envrionment
 	cp -r $(DATA_SOURCE)/* ./data/
 {%- elif cookiecutter.data_source_type == 'url' %}
 	wget $(DATA_SOURCE) -P ./data/
+{%- elif cookiecutter.data_source_type == 'git' %}
+	rm -f ./data/.gitkeep
+	[ -d ./data/.git ] && git --git-dir=./data/.git --work-tree=./data pull || git clone $(DATA_SOURCE) ./data
 {% endif %}
 
 init-docker: ## initialize docker image
@@ -75,6 +78,8 @@ sync-to-source: ## sync local data to data source
 	cp -r ./data/* $(DATA_SOURCE)/
 {%- elif cookiecutter.data_source_type == 'url' %}
 	echo "no sync target for url data source..."
+{%- elif cookiecutter.data_source_type == 'git' %}
+	git --git-dir=./data/.git --work-tree=./data push
 {% endif %}
 
 create-container: ## create docker container
